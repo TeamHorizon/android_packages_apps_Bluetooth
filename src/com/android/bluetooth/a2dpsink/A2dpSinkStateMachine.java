@@ -172,7 +172,25 @@ final class A2dpSinkStateMachine extends StateMachine {
     }
 
     public void doQuit() {
-        mStreaming.doQuit();
+        if(DBG) {
+            Log.d("A2dpSinkStateMachine", "Quit");
+        }
+
+        List<BluetoothDevice> connected_devices = getConnectedDevices();
+        Log.d("A2dpSinkStateMachine", "doQuit() array size " + connected_devices.size());
+        if (connected_devices != null) {
+            for (BluetoothDevice connected_device : connected_devices) {
+            Log.d("A2dpSinkStateMachine", "doQuit()- Move A2DP State to DISCONNECTED from CONNECTED device: " + connected_device );
+                broadcastConnectionState(connected_device, BluetoothProfile.STATE_DISCONNECTED,
+                                     BluetoothProfile.STATE_CONNECTED);
+            }
+	}
+        synchronized (A2dpSinkStateMachine.this) {
+            if (mStreaming != null) {
+                mStreaming.doQuit();
+                mStreaming = null;
+            }
+        }
         quitNow();
     }
 

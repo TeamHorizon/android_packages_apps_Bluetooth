@@ -203,14 +203,15 @@ final class A2dpStateMachine extends StateMachine {
             broadcastConnectionState(mTargetDevice, BluetoothProfile.STATE_DISCONNECTED,
                                      BluetoothProfile.STATE_CONNECTING);
         }
-
-        if ((mIncomingDevice!= null) &&
-            (getConnectionState(mIncomingDevice) == BluetoothProfile.STATE_CONNECTING)) {
-            log("doQuit()- Move A2DP State to DISCONNECTED");
-            broadcastConnectionState(mIncomingDevice, BluetoothProfile.STATE_DISCONNECTED,
-                                     BluetoothProfile.STATE_CONNECTING);
+        List<BluetoothDevice> connected_devices = getConnectedDevices();
+        Log.d("A2dpStateMachine", "doQuit() array size " + connected_devices.size());
+        if (connected_devices != null) {
+            for (BluetoothDevice connected_device : connected_devices) {
+            Log.d("A2dpStateMachine", "doQuit()- Move A2DP State to DISCONNECTED from CONNECTED device: " + connected_device );
+                broadcastConnectionState(connected_device, BluetoothProfile.STATE_DISCONNECTED,
+                                     BluetoothProfile.STATE_CONNECTED);
+            }
         }
-
         quitNow();
         log("Exit doQuit()");
     }

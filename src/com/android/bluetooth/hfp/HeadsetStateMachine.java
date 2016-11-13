@@ -309,25 +309,14 @@ final class HeadsetStateMachine extends StateMachine {
 
 
     public void doQuit() {
-        if (DBG) if (DBG) Log.d(TAG, "Enter doQuit()");
-        int size = 0;
-        if (mAudioManager != null) {
-             mAudioManager.setBluetoothScoOn(false);
-        }
-        if (mActiveScoDevice != null && !mPhoneState.getIsCsCall()) {
-            sendVoipConnectivityNetworktype(false);
-        }
-        if (mActiveScoDevice != null) {
-             broadcastAudioState(mActiveScoDevice, BluetoothHeadset.STATE_AUDIO_DISCONNECTED,
-                                BluetoothHeadset.STATE_AUDIO_CONNECTED);
-        }
-        /* Broadcast disconnected state for connected devices.*/
-        size = mConnectedDevicesList.size();
-        if (DBG) if (DBG) Log.d(TAG, "cleanup: mConnectedDevicesList size is " + size);
-        for(int i = 0; i < size; i++) {
-            mCurrentDevice = mConnectedDevicesList.get(i);
-            broadcastConnectionState(mCurrentDevice, BluetoothProfile.STATE_DISCONNECTED,
+        List<BluetoothDevice> connected_devices = getConnectedDevices();
+        Log.d(TAG, "doQuit() array size " + connected_devices.size());
+        if (connected_devices != null) {
+            for (BluetoothDevice connected_device : connected_devices) {
+            Log.d(TAG, "doQuit()- Move State to DISCONNECTED from CONNECTED device: " + connected_device );
+                broadcastConnectionState(connected_device, BluetoothProfile.STATE_DISCONNECTED,
                                      BluetoothProfile.STATE_CONNECTED);
+            }
         }
         quitNow();
         if (DBG) if (DBG) Log.d(TAG, "Exit doQuit()");

@@ -1327,9 +1327,17 @@ final class HeadsetClientStateMachine extends StateMachine {
     }
 
     public void doQuit() {
-        Log.d(TAG, "Enter doQuit()");
-        if (mAudioManager != null)
-        {
+        Log.d(TAG, "doQuit");
+        List<BluetoothDevice> connected_devices = getConnectedDevices();
+        Log.d(TAG, "doQuit() array size " + connected_devices.size());
+        if (connected_devices != null) {
+            for (BluetoothDevice connected_device : connected_devices) {
+            Log.d(TAG, "doQuit()- Move State to DISCONNECTED from CONNECTED device: " + connected_device );
+                broadcastConnectionState(connected_device, BluetoothProfile.STATE_DISCONNECTED,
+                                     BluetoothProfile.STATE_CONNECTED);
+            }
+        }
+        if (mAudioManager != null) {
             mAudioManager.setParameters("hfp_enable=false");
         }
         quitNow();
